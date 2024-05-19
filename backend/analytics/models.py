@@ -15,7 +15,9 @@ class Campaign(models.Model):
 
 
 class Offer(models.Model):
-    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE, related_name='offers')
+    campaign = models.ForeignKey(
+        Campaign, on_delete=models.CASCADE, related_name="offers"
+    )
     name = models.CharField(max_length=255)
     description = models.TextField()
     url = models.URLField()
@@ -27,7 +29,7 @@ class Offer(models.Model):
 
 
 class Click(models.Model):
-    offer = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name='clicks')
+    offer = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name="clicks")
     user_ip = models.GenericIPAddressField()
     user_agent = models.CharField(max_length=255)
     os = models.CharField(max_length=50)
@@ -38,14 +40,18 @@ class Click(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'Click by {self.user_ip} on {self.click_time}'
+        return f"Click by {self.user_ip} on {self.click_time}"
 
 
 class Lead(models.Model):
-    click = models.OneToOneField(Click, on_delete=models.CASCADE, related_name='lead')
+    click = models.OneToOneField(Click, on_delete=models.CASCADE, related_name="lead")
     lead_time = models.DateTimeField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    full_name = models.CharField(max_length=255, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f'Lead created from click on {self.click.click_time}'
+        return f"Lead created from click on {self.click.click_time}"
