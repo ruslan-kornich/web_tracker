@@ -6,6 +6,7 @@ from .serializers import (
     ClickSerializer,
     LeadSerializer,
 )
+from rest_framework.permissions import IsAuthenticated
 
 
 class CampaignViewSet(viewsets.ModelViewSet):
@@ -21,6 +22,10 @@ class OfferViewSet(viewsets.ModelViewSet):
 class ClickViewSet(viewsets.ModelViewSet):
     queryset = Click.objects.all()
     serializer_class = ClickSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save()
 
 
 class LeadViewSet(viewsets.ModelViewSet):
