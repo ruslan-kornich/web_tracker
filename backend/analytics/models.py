@@ -30,7 +30,7 @@ class Offer(models.Model):
 
 class Click(models.Model):
     offer = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name="clicks")
-    user_ip = models.GenericIPAddressField()
+    user_ip = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.CharField(max_length=255)
     os = models.CharField(max_length=50)
     browser = models.CharField(max_length=50)
