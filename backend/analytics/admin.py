@@ -38,6 +38,15 @@ class ClickAdmin(admin.ModelAdmin):
     )
     search_fields = ("user_ip", "user_agent", "os", "browser")
     list_filter = ("offer", "click_time")
+    fields = (
+        "offer",
+        "user_ip",
+        "user_agent",
+        "os",
+        "browser",
+        "click_time",
+        "landing_page_url",
+    )
 
 
 @admin.register(Lead)

@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.utils import timezone
 
 class Campaign(models.Model):
     name = models.CharField(max_length=255)
@@ -30,11 +30,11 @@ class Offer(models.Model):
 
 class Click(models.Model):
     offer = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name="clicks")
-    user_ip = models.GenericIPAddressField()
+    user_ip = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.CharField(max_length=255)
     os = models.CharField(max_length=50)
     browser = models.CharField(max_length=50)
-    click_time = models.DateTimeField(auto_now_add=True)
+    click_time = models.DateTimeField(default=timezone.now)
     landing_page_url = models.URLField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
