@@ -18,21 +18,17 @@ from django.db.models import Count
 from django.utils import timezone
 from django.db.models.functions import TruncDay
 
+
 class CampaignViewSet(viewsets.ModelViewSet):
     queryset = Campaign.objects.all()
     serializer_class = CampaignSerializer
 
-    @action(detail=True, methods=['get'])
-    def clicks(self, request, pk=None):
+    @action(detail=True, methods=["get"])
+    def offers(self, request, pk=None):
         campaign = self.get_object()
-        clicks = Click.objects.filter(offer__campaign=campaign).values('click_time').annotate(count=Count('id'))
-        return Response(clicks)
-
-    @action(detail=True, methods=['get'])
-    def leads(self, request, pk=None):
-        campaign = self.get_object()
-        leads = Lead.objects.filter(click__offer__campaign=campaign).values('lead_time').annotate(count=Count('id'))
-        return Response(leads)
+        offers = Offer.objects.filter(campaign=campaign)
+        serializer = OfferSerializer(offers, many=True)
+        return Response(serializer.data)
 
 
 class OfferViewSet(viewsets.ModelViewSet):
@@ -54,10 +50,18 @@ class OfferViewSet(viewsets.ModelViewSet):
         return Response(clicks)
 
     @action(detail=True, methods=['get'])
+    def detailed_clicks(self, request, pk=None):
+        offer = self.get_object()
+        clicks = Click.objects.filter(offer=offer)
+        serializer = ClickSerializer(clicks, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'])
     def leads(self, request, pk=None):
         offer = self.get_object()
         leads = Lead.objects.filter(click__offer=offer).annotate(date=TruncDay('lead_time')).values('date').annotate(count=Count('id')).order_by('date')
         return Response(leads)
+
 
 
 class ClickViewSet(viewsets.ModelViewSet):
@@ -79,5 +83,3 @@ class ClickViewSet(viewsets.ModelViewSet):
 class LeadViewSet(viewsets.ModelViewSet):
     queryset = Lead.objects.all()
     serializer_class = LeadSerializer
-
-

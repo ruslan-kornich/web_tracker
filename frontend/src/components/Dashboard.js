@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Grid, Card, CardContent } from '@mui/material';
+import { Container, Typography, Grid, Card, CardContent } from '@mui/material'; // Удален Button
 import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';
 
 const Dashboard = () => {
   const [campaigns, setCampaigns] = useState([]);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
+  const [offers, setOffers] = useState([]);
+  const [selectedOffer, setSelectedOffer] = useState(null);
   const [clickData, setClickData] = useState([]);
   const [leadData, setLeadData] = useState([]);
 
@@ -23,10 +25,20 @@ const Dashboard = () => {
     }
   };
 
-  const fetchAnalytics = async (campaignId) => {
+  const fetchOffers = async (campaignId) => {
     try {
-      const clicksResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/campaigns/${campaignId}/clicks/`);
-      const leadsResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/campaigns/${campaignId}/leads/`);
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/offers/?campaign=${campaignId}`);
+      const data = await response.json();
+      setOffers(data.results);
+    } catch (error) {
+      console.error('Error fetching offers:', error);
+    }
+  };
+
+  const fetchAnalytics = async (offerId) => {
+    try {
+      const clicksResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/offers/${offerId}/clicks/`);
+      const leadsResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/offers/${offerId}/leads/`);
       const clicksData = await clicksResponse.json();
       const leadsData = await leadsResponse.json();
       setClickData(clicksData);
@@ -38,9 +50,15 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (selectedCampaign) {
-      fetchAnalytics(selectedCampaign.id);
+      fetchOffers(selectedCampaign.id);
     }
   }, [selectedCampaign]);
+
+  useEffect(() => {
+    if (selectedOffer) {
+      fetchAnalytics(selectedOffer.id);
+    }
+  }, [selectedOffer]);
 
   const formatChartData = (data) => {
     return {
@@ -76,16 +94,41 @@ const Dashboard = () => {
           <Typography variant="body1">No campaigns available</Typography>
         )}
       </Grid>
+
       {selectedCampaign && (
         <>
           <Typography variant="h5" style={{ marginTop: '20px' }}>
-            Clicks Over Time
+            Offers for {selectedCampaign.name}
+          </Typography>
+          <Grid container spacing={3}>
+            {Array.isArray(offers) && offers.length > 0 ? (
+              offers.map(offer => (
+                <Grid item key={offer.id} xs={12} sm={6} md={4}>
+                  <Card onClick={() => setSelectedOffer(offer)}>
+                    <CardContent>
+                      <Typography variant="h6">{offer.name}</Typography>
+                      <Typography>{offer.description}</Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))
+            ) : (
+              <Typography variant="body1">No offers available</Typography>
+            )}
+          </Grid>
+        </>
+      )}
+
+      {selectedOffer && (
+        <>
+          <Typography variant="h5" style={{ marginTop: '20px' }}>
+            Clicks Over Time for {selectedOffer.name}
           </Typography>
           <div style={{ height: 300 }}>
             <Line data={formatChartData(clickData)} />
           </div>
           <Typography variant="h5" style={{ marginTop: '20px' }}>
-            Leads Over Time
+            Leads Over Time for {selectedOffer.name}
           </Typography>
           <div style={{ height: 300 }}>
             <Line data={formatChartData(leadData)} />
