@@ -1,6 +1,6 @@
-
 from rest_framework import serializers
 from .models import Campaign, Offer, Click, Lead
+
 
 class CampaignSerializer(serializers.ModelSerializer):
     class Meta:
