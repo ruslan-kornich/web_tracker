@@ -22,6 +22,8 @@ from django.db.models.functions import TruncDay
 class CampaignViewSet(viewsets.ModelViewSet):
     queryset = Campaign.objects.all()
     serializer_class = CampaignSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    search_fields = ['name', 'description']
 
     @action(detail=True, methods=["get"])
     def offers(self, request, pk=None):
