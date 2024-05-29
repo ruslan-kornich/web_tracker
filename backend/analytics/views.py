@@ -1,10 +1,11 @@
 from rest_framework import viewsets, status
-from .models import Campaign, Offer, Click, Lead
+from .models import Campaign, Offer, Click, Lead, Photo
 from .serializers import (
     CampaignSerializer,
     OfferSerializer,
     ClickSerializer,
     LeadSerializer,
+    PhotoSerializer
 )
 from rest_framework.permissions import IsAuthenticated
 import user_agents
@@ -99,19 +100,23 @@ class LeadViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        offer_id = data.get('offer')
-        full_name = data.get('full_name')
-        email = data.get('email')
-        phone = data.get('phone')
-        notes = data.get('notes')
+        offer_id = data.get("offer")
+        full_name = data.get("full_name")
+        email = data.get("email")
+        phone = data.get("phone")
+        notes = data.get("notes")
 
         if not offer_id:
-            return Response({"detail": "Offer is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Offer is required"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         try:
             offer = Offer.objects.get(id=offer_id)
         except Offer.DoesNotExist:
-            return Response({"detail": "Invalid offer ID"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Invalid offer ID"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         user_ip = request.META.get("REMOTE_ADDR")
         user_agent_string = request.META.get("HTTP_USER_AGENT", "")
@@ -125,7 +130,7 @@ class LeadViewSet(viewsets.ModelViewSet):
             "user_agent": user_agent_string,
             "os": os,
             "browser": browser,
-            "landing_page_url": offer.url
+            "landing_page_url": offer.url,
         }
 
         click_serializer = ClickSerializer(data=click_data)
@@ -137,14 +142,16 @@ class LeadViewSet(viewsets.ModelViewSet):
             "full_name": full_name,
             "email": email,
             "phone": phone,
-            "notes": notes
+            "notes": notes,
         }
 
         lead_serializer = self.get_serializer(data=lead_data)
         lead_serializer.is_valid(raise_exception=True)
         self.perform_create(lead_serializer)
         headers = self.get_success_headers(lead_serializer.data)
-        return Response(lead_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            lead_serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
     def perform_create(self, serializer):
         serializer.save()
@@ -161,3 +168,8 @@ class PublicOfferViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_fields = ["campaign", "name"]
     search_fields = ["name", "description"]
     ordering_fields = ["created_at", "updated_at"]
+
+
+class PhotoViewSet(viewsets.ModelViewSet):
+    queryset = Photo.objects.all()
+    serializer_class = PhotoSerializer
