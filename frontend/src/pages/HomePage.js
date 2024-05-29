@@ -1,15 +1,17 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Container, Grid, Card, CardContent, Typography, CardActions, Button, TextField } from '@mui/material';
-import UAParser from 'ua-parser-js';
+import { useNavigate } from 'react-router-dom';
+
 
 const HomePage = () => {
   const [offers, setOffers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const navigate = useNavigate();
 
   const fetchOffers = useCallback(async () => {
-    let url = `${process.env.REACT_APP_API_BASE_URL}/api/offers/?page=${page}`;
+    let url = `${process.env.REACT_APP_API_BASE_URL}/api/public_offers/?page=${page}`;
 
     if (searchQuery) {
       url += `&search=${searchQuery}`;
@@ -33,33 +35,8 @@ const HomePage = () => {
     fetchOffers();
   }, [fetchOffers]);
 
-  const handleOfferClick = (offer) => {
-    const parser = new UAParser();
-    const result = parser.getResult();
-
-    const clickData = {
-      offer: offer.id,
-      landing_page_url: offer.url,
-      user_agent: result.ua,
-      os: result.os.name,
-      browser: result.browser.name,
-    };
-
-    fetch(`${process.env.REACT_APP_API_BASE_URL}/api/clicks/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(clickData),
-    }).then(response => {
-      if (response.ok) {
-        window.location.href = offer.url;
-      } else {
-        console.error('Failed to track click');
-      }
-    }).catch(error => {
-      console.error('Error tracking click:', error);
-    });
+  const handleLearnMoreClick = (id) => {
+    navigate(`/offers/${id}/public`);
   };
 
   return (
@@ -91,7 +68,7 @@ const HomePage = () => {
                 <CardActions>
                   <Button
                     size="small"
-                    onClick={() => handleOfferClick(offer)}
+                    onClick={() => handleLearnMoreClick(offer.id)}
                   >
                     Learn More
                   </Button>
