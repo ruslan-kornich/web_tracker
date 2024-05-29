@@ -16,7 +16,6 @@ const OfferInfo = ({ offerInfo, detailedClickData, leadData }) => {
     <Paper style={{ padding: 16 }}>
       <Typography variant="h6">Offer Information</Typography>
       <Typography><strong>Name:</strong> {offerInfo.name}</Typography>
-      <Typography><strong>Description:</strong> {offerInfo.description}</Typography>
       <Typography><strong>URL:</strong> {offerInfo.url}</Typography>
       <Typography><strong>Created At:</strong> {new Date(offerInfo.created_at).toLocaleString()}</Typography>
       <Typography><strong>Updated At:</strong> {new Date(offerInfo.updated_at).toLocaleString()}</Typography>
