@@ -32,7 +32,7 @@ class Offer(models.Model):
 
 class Photo(models.Model):
     offer = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name="photos")
-    image = models.ImageField(upload_to='offers/photos/')
+    image = models.ImageField(upload_to="offers/photos/")
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

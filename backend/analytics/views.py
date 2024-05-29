@@ -5,7 +5,7 @@ from .serializers import (
     OfferSerializer,
     ClickSerializer,
     LeadSerializer,
-    PhotoSerializer
+    PhotoSerializer,
 )
 from rest_framework.permissions import IsAuthenticated
 import user_agents

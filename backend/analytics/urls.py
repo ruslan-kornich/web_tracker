@@ -6,7 +6,7 @@ from .views import (
     ClickViewSet,
     LeadViewSet,
     PublicOfferViewSet,
-    PhotoViewSet
+    PhotoViewSet,
 )
 
 router = DefaultRouter()
@@ -15,7 +15,7 @@ router.register(r"offers", OfferViewSet)
 router.register(r"clicks", ClickViewSet)
 router.register(r"leads", LeadViewSet)
 router.register(r"public_offers", PublicOfferViewSet, basename="public_offers")
-router.register(r'photos', PhotoViewSet)
+router.register(r"photos", PhotoViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),

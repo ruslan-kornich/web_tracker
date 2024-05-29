@@ -11,7 +11,7 @@ class CampaignSerializer(serializers.ModelSerializer):
 class PhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Photo
-        fields = '__all__'
+        fields = "__all__"
 
 
 class OfferSerializer(serializers.ModelSerializer):
