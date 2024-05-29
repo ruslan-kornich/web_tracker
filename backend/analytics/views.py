@@ -18,13 +18,14 @@ from rest_framework.response import Response
 from django.db.models import Count
 from django.utils import timezone
 from django.db.models.functions import TruncDay
-
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 class CampaignViewSet(viewsets.ModelViewSet):
     queryset = Campaign.objects.all()
     serializer_class = CampaignSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ["name", "description"]
+    permission_classes = [IsAuthenticated]
 
     @action(detail=True, methods=["get"])
     def offers(self, request, pk=None):
@@ -76,13 +77,6 @@ class OfferViewSet(viewsets.ModelViewSet):
             .order_by("date")
         )
         return Response(leads)
-
-    @action(detail=True, methods=["get"])
-    def detailed_leads(self, request, pk=None):
-        offer = self.get_object()
-        leads = Lead.objects.filter(click__offer=offer)
-        serializer = LeadSerializer(leads, many=True)
-        return Response(serializer.data)
 
 
 class ClickViewSet(viewsets.ModelViewSet):

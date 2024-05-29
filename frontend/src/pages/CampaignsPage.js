@@ -13,7 +13,26 @@ const CampaignsPage = () => {
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/campaigns/?page=${page}&search=${searchQuery}`);
+        const accessToken = localStorage.getItem('access_token');
+        if (!accessToken) {
+          throw new Error('Access token is missing');
+        }
+
+        const response = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/api/campaigns/?page=${page}&search=${searchQuery}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        if (response.status === 401) {
+          // Handle token refresh logic here if needed
+          console.error('Unauthorized access. Token might be expired.');
+          return;
+        }
+
         const data = await response.json();
         setCampaigns(data.results);
         setTotalPages(Math.ceil(data.count / 10)); // Assuming 10 items per page
