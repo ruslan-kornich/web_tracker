@@ -1,14 +1,37 @@
 import React from 'react';
 import { Line, Bar, Pie } from 'react-chartjs-2';
 import { Box, Tabs, Tab } from '@mui/material';
+import 'chartjs-adapter-date-fns';
+import { format, parseISO } from 'date-fns';
 
 const Charts = ({ tabIndex, handleTabChange, clickData, leadData, detailedClickData }) => {
+  const groupDataByPeriod = (data, period) => {
+    return data.reduce((acc, click) => {
+      const date = format(parseISO(click.date), period);
+      acc[date] = (acc[date] || 0) + click.count;
+      return acc;
+    }, {});
+  };
+
+  const getPeriod = (data) => {
+    const days = new Set(data.map(d => format(parseISO(d.date), 'yyyy-MM-dd')));
+    if (days.size <= 31) {
+      return 'yyyy-MM-dd'; // Group by day
+    } else if (days.size <= 365) {
+      return 'yyyy-MM'; // Group by month
+    } else {
+      return 'yyyy'; // Group by year
+    }
+  };
+
   const formatChartData = (data, label) => {
+    const period = getPeriod(data);
+    const groupedData = groupDataByPeriod(data, period);
     return {
-      labels: data.map(d => d.date),
+      labels: Object.keys(groupedData),
       datasets: [{
         label: label,
-        data: data.map(d => d.count),
+        data: Object.values(groupedData),
         borderColor: '#8884d8',
         backgroundColor: '#8884d8',
         fill: false,

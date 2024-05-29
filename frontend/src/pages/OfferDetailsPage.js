@@ -1,6 +1,5 @@
-// src/pages/OfferDetailsPage.js
 import React, { useEffect, useState, useCallback } from 'react';
-import { Container, Typography } from '@mui/material';
+import { Container, Typography, Button, ButtonGroup } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import {
   Chart as ChartJS,
@@ -17,6 +16,7 @@ import {
 import Charts from '../components/Charts';
 import OfferInfo from '../components/OfferInfo';
 import ClickDetails from '../components/ClickDetails';
+import LeadDetails from '../components/LeadDetails';
 
 ChartJS.register(
   CategoryScale,
@@ -35,8 +35,10 @@ const OfferDetailsPage = () => {
   const [clickData, setClickData] = useState([]);
   const [leadData, setLeadData] = useState([]);
   const [detailedClickData, setDetailedClickData] = useState([]);
+  const [detailedLeadData, setDetailedLeadData] = useState([]);
   const [offerInfo, setOfferInfo] = useState({});
   const [tabIndex, setTabIndex] = useState(0);
+  const [showClicks, setShowClicks] = useState(true);
 
   const fetchAnalytics = useCallback(async () => {
     try {
@@ -61,6 +63,16 @@ const OfferDetailsPage = () => {
     }
   }, [offerId]);
 
+  const fetchDetailedLeads = useCallback(async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/offers/${offerId}/detailed_leads/`);
+      const data = await response.json();
+      setDetailedLeadData(data);
+    } catch (error) {
+      console.error('Error fetching detailed lead data:', error);
+    }
+  }, [offerId]);
+
   const fetchOfferInfo = useCallback(async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/offers/${offerId}/`);
@@ -74,8 +86,9 @@ const OfferDetailsPage = () => {
   useEffect(() => {
     fetchAnalytics();
     fetchDetailedClicks();
+    fetchDetailedLeads();
     fetchOfferInfo();
-  }, [fetchAnalytics, fetchDetailedClicks, fetchOfferInfo]);
+  }, [fetchAnalytics, fetchDetailedClicks, fetchDetailedLeads, fetchOfferInfo]);
 
   return (
     <Container>
@@ -92,7 +105,19 @@ const OfferDetailsPage = () => {
         />
         <OfferInfo offerInfo={offerInfo} detailedClickData={detailedClickData} leadData={leadData} />
       </div>
-      <ClickDetails detailedClickData={detailedClickData} />
+      <ButtonGroup style={{ marginTop: '20px' }}>
+        <Button onClick={() => setShowClicks(true)} variant={showClicks ? 'contained' : 'outlined'}>
+          Click Details
+        </Button>
+        <Button onClick={() => setShowClicks(false)} variant={!showClicks ? 'contained' : 'outlined'}>
+          Lead Details
+        </Button>
+      </ButtonGroup>
+      {showClicks ? (
+        <ClickDetails detailedClickData={detailedClickData} />
+      ) : (
+        <LeadDetails leadData={detailedLeadData} />
+      )}
     </Container>
   );
 };

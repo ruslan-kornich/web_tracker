@@ -77,6 +77,13 @@ class OfferViewSet(viewsets.ModelViewSet):
         )
         return Response(leads)
 
+    @action(detail=True, methods=["get"])
+    def detailed_leads(self, request, pk=None):
+        offer = self.get_object()
+        leads = Lead.objects.filter(click__offer=offer)
+        serializer = LeadSerializer(leads, many=True)
+        return Response(serializer.data)
+
 
 class ClickViewSet(viewsets.ModelViewSet):
     queryset = Click.objects.all()
