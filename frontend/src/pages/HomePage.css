@@ -1,0 +1,28 @@
+.card-content {
+  position: relative;
+}
+
+.card-date {
+  display: block;
+  font-size: 0.75rem;
+  color: gray;
+  margin-top: 10px;
+}
+.no-offers-message {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid gray;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  text-align: center;
+  width: fit-content;
+}
+
+.no-offers-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 20px;
+}
+
