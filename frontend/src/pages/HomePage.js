@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Container, Grid, Card, CardContent, Typography, CardActions, Button, TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-
+import './HomePage.css';
 
 const HomePage = () => {
   const [offers, setOffers] = useState([]);
@@ -39,6 +39,18 @@ const HomePage = () => {
     navigate(`/offers/${id}/public`);
   };
 
+  const truncateDescription = (description, maxLength) => {
+    if (description.length <= maxLength) {
+      return description;
+    }
+    return description.substr(0, maxLength) + '...';
+  };
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
   return (
     <Container>
       <Typography variant="h4" gutterBottom>
@@ -58,26 +70,37 @@ const HomePage = () => {
             <Grid item key={offer.id} xs={12} sm={6} md={4}>
               <Card>
                 <CardContent>
-                  <Typography variant="h5" component="div">
+                  <Typography variant="h5" component="div" style={{ fontWeight: 'bold' }}>
                     {offer.name}
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
-                    {offer.description}
+                    {truncateDescription(offer.description, 100)}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" style={{ marginTop: 10 }}>
+                    <strong>Price:</strong> ${offer.price}
+                  </Typography>
+                  <Typography variant="caption" color="textSecondary" style={{ marginTop: 10 }}>
+                    {formatDate(offer.updated_at)}
                   </Typography>
                 </CardContent>
                 <CardActions>
                   <Button
                     size="small"
                     onClick={() => handleLearnMoreClick(offer.id)}
+                    style={{ color: 'white', backgroundColor: 'blue' }}
                   >
-                    Learn More
+                    Read More
                   </Button>
                 </CardActions>
               </Card>
             </Grid>
           ))
         ) : (
-          <Typography variant="body1">No offers available</Typography>
+          <div className="no-offers-container">
+            <Typography variant="body1" className="no-offers-message">
+              No offers available
+            </Typography>
+          </div>
         )}
       </Grid>
       <div style={{ marginTop: '20px' }}>

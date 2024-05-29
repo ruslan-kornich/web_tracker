@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, Card, CardContent, Typography, Button } from '@mui/material';
+import { Container, Typography, Button } from '@mui/material';
+import ImageGallery from 'react-image-gallery';
+import 'react-image-gallery/styles/css/image-gallery.css';
+import './PublicOfferDetailsPage.css';
 import LeadFormModal from '../components/LeadFormModal';
 
 const PublicOfferDetailsPage = () => {
@@ -34,30 +37,39 @@ const PublicOfferDetailsPage = () => {
     return <Typography>Loading...</Typography>;
   }
 
+  const images = offer.photos?.map((photo) => ({
+    original: photo.image,
+    thumbnail: photo.image,
+  })) || [];
+
   return (
     <Container>
-      <Card>
-        <CardContent>
-          <Typography variant="h5" component="div">
+      <div className="offer-details">
+        {images.length > 0 && (
+          <div className="offer-gallery">
+            <ImageGallery
+              items={images}
+              showThumbnails={true}
+              showFullscreenButton={true}
+              showPlayButton={false}
+            />
+          </div>
+        )}
+        <div className="offer-info">
+          <Typography variant="h5" component="h5">
             {offer.name}
           </Typography>
           <Typography variant="body2" color="textSecondary">
             {offer.description}
           </Typography>
-          <Typography variant="body2" color="textSecondary" style={{ marginTop: 10 }}>
-            <strong>URL:</strong> <a href={offer.url} target="_blank" rel="noopener noreferrer">{offer.url}</a>
+          <Typography variant="body2" color="textSecondary" className="price">
+            Price: ${offer.price}
           </Typography>
-          <Typography variant="body2" color="textSecondary">
-            <strong>Created At:</strong> {new Date(offer.created_at).toLocaleDateString()}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            <strong>Updated At:</strong> {new Date(offer.updated_at).toLocaleDateString()}
-          </Typography>
-        </CardContent>
-        <Button size="large" onClick={handleBuyClick}>
-          Buy
-        </Button>
-      </Card>
+          <Button size="large" onClick={handleBuyClick} className="buy-button">
+            Buy
+          </Button>
+        </div>
+      </div>
       <LeadFormModal isModalOpen={isModalOpen} handleModalClose={handleModalClose} offerId={offer.id} />
     </Container>
   );

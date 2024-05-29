@@ -1,0 +1,32 @@
+.offer-details {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.offer-gallery {
+  max-width: 500px;
+  margin-right: 20px;
+}
+
+.offer-info {
+  flex: 1;
+}
+
+.offer-info h5 {
+  margin: 0 0 10px 0;
+}
+
+.offer-info p {
+  margin: 10px 0;
+}
+
+.offer-info .price {
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.offer-info .buy-button {
+  background-color: blue;
+  color: white;
+}

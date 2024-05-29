@@ -81,7 +81,7 @@ const LeadFormModal = ({ isModalOpen, handleModalClose, offerId }) => {
               margin="normal"
             />
             <Button onClick={handleFormSubmit} variant="contained" color="primary">
-              Submit
+              Order
             </Button>
           </>
         ) : (
