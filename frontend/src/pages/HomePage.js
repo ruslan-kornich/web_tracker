@@ -50,7 +50,7 @@ const HomePage = () => {
       browser: result.browser.name,
     };
 
-    console.log("Click data:", clickData);  // Добавлено для проверки данных
+    console.log("Click data:", clickData);
 
     fetch(`${process.env.REACT_APP_API_BASE_URL}/api/clicks/`, {
       method: 'POST',
@@ -94,8 +94,8 @@ const HomePage = () => {
         {Array.isArray(offers) && offers.length > 0 ? (
           offers.map(offer => (
             <Grid item key={offer.id} xs={12} sm={6} md={4}>
-              <Card>
-                <CardContent>
+              <Card className="card">
+                <CardContent className="card-content">
                   <Typography variant="h5" component="div" style={{ fontWeight: 'bold' }}>
                     {offer.name}
                   </Typography>
@@ -109,7 +109,7 @@ const HomePage = () => {
                     {formatDate(offer.updated_at)}
                   </Typography>
                 </CardContent>
-                <CardActions>
+                <CardActions className="card-actions">
                   <Button
                     size="small"
                     onClick={() => handleOfferClick(offer)}
