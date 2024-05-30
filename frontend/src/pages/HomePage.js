@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Container, Grid, Card, CardContent, Typography, CardActions, Button, TextField } from '@mui/material';
+import UAParser from 'ua-parser-js';
 import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
 
@@ -35,8 +36,33 @@ const HomePage = () => {
     fetchOffers();
   }, [fetchOffers]);
 
-  const handleLearnMoreClick = (id) => {
-    navigate(`/offers/${id}/public`);
+  const handleOfferClick = (offer) => {
+    const parser = new UAParser();
+    const result = parser.getResult();
+
+    const urlWithScheme = offer.url.startsWith('http://') || offer.url.startsWith('https://') ? offer.url : `http://${offer.url}`;
+
+    const clickData = {
+      offer: offer.id,
+      landing_page_url: urlWithScheme,
+      user_agent: result.ua,
+      os: result.os.name,
+      browser: result.browser.name,
+    };
+
+    console.log("Click data:", clickData);  // Добавлено для проверки данных
+
+    fetch(`${process.env.REACT_APP_API_BASE_URL}/api/clicks/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(clickData),
+    }).catch(error => {
+      console.error('Error tracking click:', error);
+    });
+
+    navigate(`/offers/${offer.id}/public`);
   };
 
   const truncateDescription = (description, maxLength) => {
@@ -86,10 +112,10 @@ const HomePage = () => {
                 <CardActions>
                   <Button
                     size="small"
-                    onClick={() => handleLearnMoreClick(offer.id)}
+                    onClick={() => handleOfferClick(offer)}
                     style={{ color: 'white', backgroundColor: 'blue' }}
                   >
-                    Read More
+                    Learn More
                   </Button>
                 </CardActions>
               </Card>

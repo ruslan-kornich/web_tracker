@@ -1,10 +1,11 @@
 import React from 'react';
-import { Card, CardContent, Typography, CardActions, Button } from '@mui/material';
+import { Card, CardContent, Typography, CardActions, IconButton, Button } from '@mui/material';
+import { Edit, Delete } from '@mui/icons-material';
 
-const CampaignCard = ({ campaign, onClick }) => {
+const CampaignCard = ({ campaign, onClick, onEditClick, onDeleteClick }) => {
   return (
-    <Card onClick={() => onClick(campaign.id)} style={{ cursor: 'pointer' }}>
-      <CardContent>
+    <Card style={{ position: 'relative' }}>
+      <CardContent onClick={() => onClick(campaign.id)} style={{ cursor: 'pointer' }}>
         <Typography variant="h5" component="div">
           {campaign.name}
         </Typography>
@@ -26,6 +27,14 @@ const CampaignCard = ({ campaign, onClick }) => {
           View Details
         </Button>
       </CardActions>
+      <div style={{ position: 'absolute', top: 10, right: 10 }}>
+        <IconButton onClick={(e) => { e.stopPropagation(); onEditClick(campaign); }} aria-label="edit">
+          <Edit />
+        </IconButton>
+        <IconButton onClick={(e) => { e.stopPropagation(); onDeleteClick(campaign); }} aria-label="delete">
+          <Delete />
+        </IconButton>
+      </div>
     </Card>
   );
 };
