@@ -1,7 +1,8 @@
 # WEB Tracker
 
 **Task:**  
-Create a web analytics tracker for advertising campaigns. The tracker should track clicks on advertising links and transitions to landing pages. It should also store information about the user who made the click or transition.
+Create a web analytics tracker for advertising campaigns. The tracker should track clicks on advertising links and transitions to landing pages. 
+It should also store information about the user who made the click or transition.
 
 ## Stack
 
@@ -46,6 +47,8 @@ Create a web analytics tracker for advertising campaigns. The tracker should tra
     docker-compose up --build
     ```
 
+The main app will be available on the page http://0.0.0.0:3000
+
 ## Upload Data
 
 After installation, you can either run the application yourself from scratch or install ready-made data:
@@ -62,7 +65,13 @@ After installation, you can either run the application yourself from scratch or 
 
     Create your user.
 
+After creating a user in the application you can go to the campaigns panel and create campaigns and offers from scratch 
+in a clean application without data. 
+
 2. **Download the prepared data:**
+
+Test data and a test user will be created in the application, which will allow to see clearly the functionality of the application
+After assembly of the docker containers run:
 
     ```bash
     docker exec -it web_tracker_backend_1 /bin/bash
@@ -74,12 +83,14 @@ After installation, you can either run the application yourself from scratch or 
 
     This will load the prepared data:
 
+    Test user:
+
     - **Login:** admin
     - **Password:** admin
 
 ## Docs
 
-Documentation will be available at:
+Documentation will be available at pages:
 
 - Swagger UI: [http://0.0.0.0:8000/swagger/](http://0.0.0.0:8000/swagger/)
 - ReDoc: [http://0.0.0.0:8000/redoc/](http://0.0.0.0:8000/redoc/)
