@@ -23,7 +23,7 @@ const NavBar = ({ isAuthenticated }) => {
     <AppBar position="static">
       <Toolbar>
         <Typography variant="h6" style={{ flexGrow: 1 }}>
-          Web Analytics Tracker
+          <Button color="inherit" component={Link} to="/">Web Analytics Tracker</Button>
         </Typography>
         <Button color="inherit" component={Link} to="/">Home</Button>
         <Button color="inherit" component={Link} to="/campaigns">Campaigns</Button>
