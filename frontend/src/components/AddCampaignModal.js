@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Modal, Box, TextField, Button, Typography } from '@mui/material';
 
-const EditCampaignModal = ({ open, handleClose, campaign, handleSave }) => {
+const AddCampaignModal = ({ open, handleClose, handleAdd }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -9,26 +9,49 @@ const EditCampaignModal = ({ open, handleClose, campaign, handleSave }) => {
   const [budget, setBudget] = useState('');
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (campaign) {
-      console.log('Editing campaign:', campaign);
-      setName(campaign.name);
-      setDescription(campaign.description);
-      setStartDate(campaign.start_date ? campaign.start_date.split('T')[0] : '');
-      setEndDate(campaign.end_date ? campaign.end_date.split('T')[0] : '');
-      setBudget(campaign.budget);
-    }
-  }, [campaign]);
-
   const handleSubmit = async () => {
     if (!name || !description || !startDate || !endDate || !budget) {
       setError('All fields are required');
       return;
     }
 
-    const updatedCampaign = { ...campaign, name, description, start_date: startDate, end_date: endDate, budget };
-    await handleSave(updatedCampaign);
-    handleClose();
+    const newCampaign = { name, description, start_date: startDate, end_date: endDate, budget };
+    console.log('Collected Data:', newCampaign);
+
+    const accessToken = localStorage.getItem('access_token');
+    console.log('Access Token:', accessToken);
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/campaigns/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(newCampaign),
+      });
+
+      console.log('Response Status:', response.status);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Response Data:', data);
+        handleAdd(data);
+        setName('');
+        setDescription('');
+        setStartDate('');
+        setEndDate('');
+        setBudget('');
+        setError('');
+      } else {
+        const errorData = await response.json();
+        console.error('Error adding campaign:', errorData);
+        setError('Failed to add campaign');
+      }
+    } catch (error) {
+      console.error('Error adding campaign:', error);
+      setError('Failed to add campaign');
+    }
   };
 
   return (
@@ -47,7 +70,7 @@ const EditCampaignModal = ({ open, handleClose, campaign, handleSave }) => {
         }}
       >
         <Typography variant="h6" gutterBottom>
-          Edit Campaign
+          Add Campaign
         </Typography>
         {error && (
           <Typography color="error" gutterBottom>
@@ -55,22 +78,20 @@ const EditCampaignModal = ({ open, handleClose, campaign, handleSave }) => {
           </Typography>
         )}
         <TextField
-          label="Name"
-          variant="outlined"
-          fullWidth
-          margin="normal"
+          label="Campaign Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          margin="normal"
           required
+          fullWidth
         />
         <TextField
           label="Description"
-          variant="outlined"
-          fullWidth
-          margin="normal"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          margin="normal"
           required
+          fullWidth
         />
         <TextField
           label="Start Date"
@@ -106,11 +127,11 @@ const EditCampaignModal = ({ open, handleClose, campaign, handleSave }) => {
           fullWidth
         />
         <Button variant="contained" color="primary" onClick={handleSubmit}>
-          Save
+          Add Campaign
         </Button>
       </Box>
     </Modal>
   );
 };
 
-export default EditCampaignModal;
+export default AddCampaignModal;

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, TextField, Pagination, Box } from '@mui/material';
+import { Container, Typography, TextField, Pagination, Box, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import CampaignList from '../components/CampaignList';
 import EditCampaignModal from '../components/EditCampaignModal';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
+import AddCampaignModal from '../components/AddCampaignModal';
 
 const CampaignsPage = () => {
   const [campaigns, setCampaigns] = useState([]);
@@ -12,6 +13,7 @@ const CampaignsPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
   const navigate = useNavigate();
 
@@ -112,6 +114,30 @@ const CampaignsPage = () => {
     }
   };
 
+  const handleAdd = async (newCampaign) => {
+    const accessToken = localStorage.getItem('access_token');
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/campaigns/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(newCampaign),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setCampaigns((prevCampaigns) => [...prevCampaigns, data]);
+        setAddModalOpen(false);
+      } else {
+        console.error('Error adding campaign');
+      }
+    } catch (error) {
+      console.error('Error adding campaign:', error);
+    }
+  };
+
   return (
     <Container>
       <Typography variant="h4" gutterBottom>
@@ -125,6 +151,9 @@ const CampaignsPage = () => {
         value={searchQuery}
         onChange={handleSearchChange}
       />
+      <Button variant="contained" color="primary" onClick={() => setAddModalOpen(true)}>
+        Add Campaign
+      </Button>
       <CampaignList
         campaigns={campaigns}
         onCardClick={handleCardClick}
@@ -149,6 +178,11 @@ const CampaignsPage = () => {
         open={deleteModalOpen}
         handleClose={() => setDeleteModalOpen(false)}
         handleDelete={handleDelete}
+      />
+      <AddCampaignModal
+        open={addModalOpen}
+        handleClose={() => setAddModalOpen(false)}
+        handleAdd={handleAdd}
       />
     </Container>
   );
