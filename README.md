@@ -22,7 +22,7 @@ Additional:
 
 
 ```bash
-git clone https://github.com/ruslan-kornich/web_tracker
+git clone https://github.com/ruslan-kornich/web_tracker](https://github.com/ruslan-kornich/web_tracker.git
 ```
 
 - Create .env files in folders /backend and /frontend like example:
@@ -57,7 +57,7 @@ docker exec -it web_tracker_backend_1 /bin/bash
 ```
 
 ```bash
-python createsuperuser
+python manage.py createsuperuser
 ```
 And create your user
 
@@ -71,7 +71,7 @@ docker exec -it web_tracker_backend_1 /bin/bash
 python manage.py loaddata data.json
 ```
 
-This will load the finished data 
+This will load the prepeared data 
 
 login : admin
 password : admin
