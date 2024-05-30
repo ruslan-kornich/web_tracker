@@ -7,6 +7,7 @@ from .serializers import (
     LeadSerializer,
     PhotoSerializer,
 )
+import json
 from rest_framework.permissions import IsAuthenticated
 import user_agents
 from rest_framework import viewsets, filters
@@ -37,7 +38,7 @@ class CampaignViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+        partial = kwargs.pop("partial", False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
@@ -101,6 +102,66 @@ class OfferViewSet(viewsets.ModelViewSet):
         serializer = LeadSerializer(leads, many=True)
         return Response(serializer.data)
 
+    def create(self, request, *args, **kwargs):
+        print(request.POST)
+        # Process photo files
+        photo_files = request.FILES.getlist('photo_files')
+
+        # Create new offer instance
+        data = request.data.copy()
+        instance = Offer(
+            name=data.get('name'),
+            description=data.get('description'),
+            url=data.get('url'),
+            price=data.get('price'),
+            campaign_id=data.get('campaign')
+        )
+
+        instance.save()
+
+        for photo_file in photo_files:
+            Photo.objects.create(offer=instance, image=photo_file)
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        print(request.POST)
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+
+        # Process photo files
+        photo_files = request.FILES.getlist('photo_files')
+
+        # Update existing fields
+        data = request.data.copy()
+        existing_photos_str = data.get('existing_photos', '[]')
+        try:
+            existing_photos = json.loads(existing_photos_str)
+            existing_photos = [int(photo_id) for photo_id in existing_photos]
+        except (ValueError, TypeError) as e:
+            return Response({"error": "Invalid existing photos data"}, status=400)
+
+        if existing_photos:
+            Photo.objects.filter(offer=instance).exclude(id__in=existing_photos).delete()
+
+        for photo_file in photo_files:
+            Photo.objects.create(offer=instance, image=photo_file)
+
+        # Manually update each field in the instance
+        instance.name = data.get('name', instance.name)
+        instance.description = data.get('description', instance.description)
+        instance.url = data.get('url', instance.url)
+        instance.price = data.get('price', instance.price)
+        instance.campaign_id = data.get('campaign', instance.campaign_id)
+
+        instance.save()
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
 
 class ClickViewSet(viewsets.ModelViewSet):
     queryset = Click.objects.all()
