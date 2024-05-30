@@ -8,36 +8,56 @@ from .serializers import (
     PhotoSerializer,
 )
 import json
-from rest_framework.permissions import IsAuthenticated
 import user_agents
 from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Offer
-from .serializers import OfferSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db.models import Count
-from django.utils import timezone
 from django.db.models.functions import TruncDay
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .permissions import AllowAnyPostAndAuthenticatedReadOnly, IsAdminOrReadOnly
 
 
 class CampaignViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for viewing and editing campaign instances.
+    """
+
     queryset = Campaign.objects.all()
     serializer_class = CampaignSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ["name", "description"]
     permission_classes = [IsAuthenticated]
+    http_method_names = ["get", "post", "put", "delete"]
 
     @action(detail=True, methods=["get"])
     def offers(self, request, pk=None):
+        """
+        Retrieve the list of offers associated with a specific campaign.
+        """
         campaign = self.get_object()
         offers = Offer.objects.filter(campaign=campaign)
         serializer = OfferSerializer(offers, many=True)
         return Response(serializer.data)
 
+    def create(self, request, *args, **kwargs):
+        """
+        Create a new campaign.
+        """
+        print(request.POST)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
+
     def update(self, request, *args, **kwargs):
+        """
+        Update an existing campaign.
+        """
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
@@ -46,12 +66,19 @@ class CampaignViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
+        """
+        Delete a campaign.
+        """
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class OfferViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for viewing and editing offer instances.
+    """
+
     queryset = Offer.objects.all()
     serializer_class = OfferSerializer
     filter_backends = [
@@ -63,9 +90,13 @@ class OfferViewSet(viewsets.ModelViewSet):
     search_fields = ["name", "description"]
     ordering_fields = ["created_at", "updated_at"]
     permission_classes = [IsAuthenticated]
+    http_method_names = ["get", "post", "put", "delete"]
 
     @action(detail=True, methods=["get"])
     def clicks(self, request, pk=None):
+        """
+        Retrieve the count of clicks associated with a specific offer, grouped by day.
+        """
         offer = self.get_object()
         clicks = (
             Click.objects.filter(offer=offer)
@@ -78,6 +109,9 @@ class OfferViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["get"])
     def detailed_clicks(self, request, pk=None):
+        """
+        Retrieve detailed information about clicks associated with a specific offer.
+        """
         offer = self.get_object()
         clicks = Click.objects.filter(offer=offer)
         serializer = ClickSerializer(clicks, many=True)
@@ -85,6 +119,9 @@ class OfferViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["get"])
     def leads(self, request, pk=None):
+        """
+        Retrieve the count of leads associated with a specific offer, grouped by day.
+        """
         offer = self.get_object()
         leads = (
             Lead.objects.filter(click__offer=offer)
@@ -97,12 +134,18 @@ class OfferViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["get"])
     def detailed_leads(self, request, pk=None):
+        """
+        Retrieve detailed information about leads associated with a specific offer.
+        """
         offer = self.get_object()
         leads = Lead.objects.filter(click__offer=offer)
         serializer = LeadSerializer(leads, many=True)
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
+        """
+        Create a new offer.
+        """
         print(request.POST)
         # Process photo files
         photo_files = request.FILES.getlist("photo_files")
@@ -126,6 +169,9 @@ class OfferViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
+        """
+        Update an existing offer.
+        """
         print(request.POST)
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
@@ -163,17 +209,28 @@ class OfferViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
+        """
+        Delete an offer.
+        """
         return super().destroy(request, *args, **kwargs)
 
 
 class ClickViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for viewing and editing click instances.
+    """
+
     queryset = Click.objects.all()
     serializer_class = ClickSerializer
     permission_classes = [AllowAnyPostAndAuthenticatedReadOnly]
+    http_method_names = ["get", "post", "put", "delete"]
 
     def perform_create(self, serializer):
+        """
+        Save a new click instance.
+        """
         request = self.request
-        print("Request POST data:", request.data)  # Логирование данных запроса
+        print("Request POST data:", request.data)  # Log request data
         user_ip = request.META.get("REMOTE_ADDR")
         user_agent_string = request.META.get("HTTP_USER_AGENT")
         user_agent = user_agents.parse(user_agent_string)
@@ -187,7 +244,10 @@ class ClickViewSet(viewsets.ModelViewSet):
         )
 
     def create(self, request, *args, **kwargs):
-        print("Incoming data:", request.data)  # Логирование данных запроса
+        """
+        Create a new click instance.
+        """
+        print("Incoming data:", request.data)  # Log request data
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             self.perform_create(serializer)
@@ -196,18 +256,24 @@ class ClickViewSet(viewsets.ModelViewSet):
                 serializer.data, status=status.HTTP_201_CREATED, headers=headers
             )
         else:
-            print(
-                "Serializer errors:", serializer.errors
-            )  # Логирование ошибок сериализатора
+            print("Serializer errors:", serializer.errors)  # Log serializer errors
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LeadViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for viewing and editing lead instances.
+    """
+
     queryset = Lead.objects.all()
     serializer_class = LeadSerializer
     permission_classes = [AllowAnyPostAndAuthenticatedReadOnly]
+    http_method_names = ["get", "post", "put", "delete"]
 
     def create(self, request, *args, **kwargs):
+        """
+        Create a new lead instance.
+        """
         data = request.data
         offer_id = data.get("offer")
         full_name = data.get("full_name")
@@ -263,10 +329,17 @@ class LeadViewSet(viewsets.ModelViewSet):
         )
 
     def perform_create(self, serializer):
+        """
+        Save a new lead instance.
+        """
         serializer.save()
 
 
 class PublicOfferViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    A viewset for viewing public offers.
+    """
+
     queryset = Offer.objects.all()
     serializer_class = OfferSerializer
     filter_backends = [
@@ -281,6 +354,10 @@ class PublicOfferViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class PhotoViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for viewing and editing photo instances.
+    """
+
     queryset = Photo.objects.all()
     serializer_class = PhotoSerializer
     permission_classes = [AllowAny]

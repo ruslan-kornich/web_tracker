@@ -28,6 +28,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
     "http://localhost:8000",
+    "0.0.0.0",
 ]
 
 # Application definition
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "analytics",
     "django_filters",
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [
@@ -160,4 +162,5 @@ SIMPLE_JWT = {
 }
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
+    "http://0.0.0.0:3000",
 ]
