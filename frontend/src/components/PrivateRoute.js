@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 const PrivateRoute = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -16,24 +17,30 @@ const PrivateRoute = ({ children }) => {
       }
 
       try {
-        // Токен существует, считаем пользователя аутентифицированным
-        setIsAuthenticated(true);
-      } catch (error) {
-        // Если возникла ошибка, попробуем обновить токен
-        if (refreshToken) {
-          try {
-            const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/token/refresh/`, {
-              refresh: refreshToken,
-            });
-            localStorage.setItem('access_token', response.data.access);
-            setIsAuthenticated(true);
-          } catch (refreshError) {
-            // Если обновление токена не удалось, перенаправляем на страницу логина
+        const decodedToken = jwtDecode(accessToken);
+        const currentTime = Date.now() / 1000;
+
+        if (decodedToken.exp < currentTime) {
+          // Token is expired, try to refresh
+          if (refreshToken) {
+            try {
+              const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/token/refresh/`, {
+                refresh: refreshToken,
+              });
+              localStorage.setItem('access_token', response.data.access);
+              setIsAuthenticated(true);
+            } catch (refreshError) {
+              setIsAuthenticated(false);
+            }
+          } else {
             setIsAuthenticated(false);
           }
         } else {
-          setIsAuthenticated(false);
+          // Token is valid
+          setIsAuthenticated(true);
         }
+      } catch (error) {
+        setIsAuthenticated(false);
       }
     };
 

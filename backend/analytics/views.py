@@ -19,6 +19,8 @@ from django.db.models import Count
 from django.utils import timezone
 from django.db.models.functions import TruncDay
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from .permissions import AllowAnyPostAndAuthenticatedReadOnly, IsAdminOrReadOnly
+
 
 class CampaignViewSet(viewsets.ModelViewSet):
     queryset = Campaign.objects.all()
@@ -46,6 +48,7 @@ class OfferViewSet(viewsets.ModelViewSet):
     filterset_fields = ["campaign", "name"]
     search_fields = ["name", "description"]
     ordering_fields = ["created_at", "updated_at"]
+    permission_classes = [IsAuthenticated]
 
     @action(detail=True, methods=["get"])
     def clicks(self, request, pk=None):
@@ -78,10 +81,18 @@ class OfferViewSet(viewsets.ModelViewSet):
         )
         return Response(leads)
 
+    @action(detail=True, methods=["get"])
+    def detailed_leads(self, request, pk=None):
+        offer = self.get_object()
+        leads = Lead.objects.filter(click__offer=offer)
+        serializer = LeadSerializer(leads, many=True)
+        return Response(serializer.data)
+
 
 class ClickViewSet(viewsets.ModelViewSet):
     queryset = Click.objects.all()
     serializer_class = ClickSerializer
+    permission_classes = [AllowAnyPostAndAuthenticatedReadOnly]
 
     def perform_create(self, serializer):
         request = self.request
@@ -98,6 +109,7 @@ class ClickViewSet(viewsets.ModelViewSet):
 class LeadViewSet(viewsets.ModelViewSet):
     queryset = Lead.objects.all()
     serializer_class = LeadSerializer
+    permission_classes = [AllowAnyPostAndAuthenticatedReadOnly]
 
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -169,8 +181,10 @@ class PublicOfferViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_fields = ["campaign", "name"]
     search_fields = ["name", "description"]
     ordering_fields = ["created_at", "updated_at"]
+    permission_classes = [AllowAny]
 
 
 class PhotoViewSet(viewsets.ModelViewSet):
     queryset = Photo.objects.all()
     serializer_class = PhotoSerializer
+    permission_classes = [AllowAny]

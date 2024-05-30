@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Container, Typography, Button, ButtonGroup } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -39,11 +39,26 @@ const OfferDetailsPage = () => {
   const [offerInfo, setOfferInfo] = useState({});
   const [tabIndex, setTabIndex] = useState(0);
   const [showClicks, setShowClicks] = useState(true);
+  const navigate = useNavigate();
 
   const fetchAnalytics = useCallback(async () => {
     try {
-      const clicksResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/offers/${offerId}/clicks/`);
-      const leadsResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/offers/${offerId}/leads/`);
+      const accessToken = localStorage.getItem('access_token');
+      if (!accessToken) {
+        navigate('/login');
+        return;
+      }
+
+      const clicksResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/offers/${offerId}/clicks/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const leadsResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/offers/${offerId}/leads/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       const clicksData = await clicksResponse.json();
       const leadsData = await leadsResponse.json();
       setClickData(clicksData);
@@ -51,37 +66,67 @@ const OfferDetailsPage = () => {
     } catch (error) {
       console.error('Error fetching analytics:', error);
     }
-  }, [offerId]);
+  }, [offerId, navigate]);
 
   const fetchDetailedClicks = useCallback(async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/offers/${offerId}/detailed_clicks/`);
+      const accessToken = localStorage.getItem('access_token');
+      if (!accessToken) {
+        navigate('/login');
+        return;
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/offers/${offerId}/detailed_clicks/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       const data = await response.json();
       setDetailedClickData(data);
     } catch (error) {
       console.error('Error fetching detailed click data:', error);
     }
-  }, [offerId]);
+  }, [offerId, navigate]);
 
   const fetchDetailedLeads = useCallback(async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/offers/${offerId}/detailed_leads/`);
+      const accessToken = localStorage.getItem('access_token');
+      if (!accessToken) {
+        navigate('/login');
+        return;
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/offers/${offerId}/detailed_leads/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       const data = await response.json();
       setDetailedLeadData(data);
     } catch (error) {
       console.error('Error fetching detailed lead data:', error);
     }
-  }, [offerId]);
+  }, [offerId, navigate]);
 
   const fetchOfferInfo = useCallback(async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/offers/${offerId}/`);
+      const accessToken = localStorage.getItem('access_token');
+      if (!accessToken) {
+        navigate('/login');
+        return;
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/offers/${offerId}/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       const data = await response.json();
       setOfferInfo(data);
     } catch (error) {
       console.error('Error fetching offer info:', error);
     }
-  }, [offerId]);
+  }, [offerId, navigate]);
 
   useEffect(() => {
     fetchAnalytics();

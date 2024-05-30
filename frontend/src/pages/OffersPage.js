@@ -10,7 +10,23 @@ const OffersPage = () => {
 
   const fetchOffers = useCallback(async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/campaigns/${campaignId}/offers`);
+      const accessToken = localStorage.getItem('access_token');
+      if (!accessToken) {
+        throw new Error('Access token is missing');
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/campaigns/${campaignId}/offers`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.status === 401) {
+        // Handle token refresh logic here if needed
+        console.error('Unauthorized access. Token might be expired.');
+        return;
+      }
+
       const data = await response.json();
       setOffers(data);
     } catch (error) {
@@ -33,7 +49,7 @@ const OffersPage = () => {
       </Typography>
       <Grid container spacing={3}>
         {Array.isArray(offers) && offers.length > 0 ? (
-          offers.map(offer => (
+          offers.map((offer) => (
             <Grid item key={offer.id} xs={12} sm={6} md={4}>
               <Card onClick={() => handleOfferClick(offer.id)}>
                 <CardContent>
