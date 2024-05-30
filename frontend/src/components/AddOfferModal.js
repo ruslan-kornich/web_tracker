@@ -37,10 +37,25 @@ const AddOfferModal = ({ open, handleClose, handleSave, campaignId }) => {
     setTimeout(() => {
       setUpdateSuccess(false);
     }, 3000); // Hide success message after 3 seconds
+    handleFormReset();
+  };
+
+  const handleFormReset = () => {
+    setName('');
+    setDescription('');
+    setUrl('');
+    setPrice('');
+    setPhotos([]);
+    setError('');
+  };
+
+  const handleCloseModal = () => {
+    handleFormReset();
+    handleClose();
   };
 
   return (
-    <Modal open={open} onClose={handleClose}>
+    <Modal open={open} onClose={handleCloseModal}>
       <Box sx={{ ...modalStyle }}>
         <TextField
           label="Name"
@@ -59,6 +74,8 @@ const AddOfferModal = ({ open, handleClose, handleSave, campaignId }) => {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
+          multiline
+          rows={4}
         />
         <TextField
           label="URL"
@@ -130,7 +147,7 @@ const AddOfferModal = ({ open, handleClose, handleSave, campaignId }) => {
           <Button variant="contained" color="primary" onClick={handleSubmit} sx={{ mr: 2 }}>
             Save
           </Button>
-          <Button variant="contained" color="secondary" onClick={handleClose}>
+          <Button variant="contained" color="secondary" onClick={handleCloseModal}>
             Close
           </Button>
         </Box>

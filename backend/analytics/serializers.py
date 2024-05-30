@@ -26,22 +26,27 @@ class OfferSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Offer
-        fields = '__all__'
+        fields = "__all__"
 
     def validate(self, data):
-        if not data.get('name'):
+        if not data.get("name"):
             raise serializers.ValidationError("Name is required")
-        if not data.get('description'):
+        if not data.get("description"):
             raise serializers.ValidationError("Description is required")
-        if not data.get('price'):
+        if not data.get("price"):
             raise serializers.ValidationError("Price is required")
-        if 'photos' in data and len(data['photos']) == 0:
+        if "photos" in data and len(data["photos"]) == 0:
             raise serializers.ValidationError("At least one photo is required")
         return data
+
+
 class ClickSerializer(serializers.ModelSerializer):
     class Meta:
         model = Click
         fields = "__all__"
+        extra_kwargs = {
+            "landing_page_url": {"required": False},
+        }
 
 
 class LeadSerializer(serializers.ModelSerializer):

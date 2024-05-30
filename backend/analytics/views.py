@@ -105,16 +105,16 @@ class OfferViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         print(request.POST)
         # Process photo files
-        photo_files = request.FILES.getlist('photo_files')
+        photo_files = request.FILES.getlist("photo_files")
 
         # Create new offer instance
         data = request.data.copy()
         instance = Offer(
-            name=data.get('name'),
-            description=data.get('description'),
-            url=data.get('url'),
-            price=data.get('price'),
-            campaign_id=data.get('campaign')
+            name=data.get("name"),
+            description=data.get("description"),
+            url=data.get("url"),
+            price=data.get("price"),
+            campaign_id=data.get("campaign"),
         )
 
         instance.save()
@@ -131,11 +131,11 @@ class OfferViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
 
         # Process photo files
-        photo_files = request.FILES.getlist('photo_files')
+        photo_files = request.FILES.getlist("photo_files")
 
         # Update existing fields
         data = request.data.copy()
-        existing_photos_str = data.get('existing_photos', '[]')
+        existing_photos_str = data.get("existing_photos", "[]")
         try:
             existing_photos = json.loads(existing_photos_str)
             existing_photos = [int(photo_id) for photo_id in existing_photos]
@@ -143,17 +143,19 @@ class OfferViewSet(viewsets.ModelViewSet):
             return Response({"error": "Invalid existing photos data"}, status=400)
 
         if existing_photos:
-            Photo.objects.filter(offer=instance).exclude(id__in=existing_photos).delete()
+            Photo.objects.filter(offer=instance).exclude(
+                id__in=existing_photos
+            ).delete()
 
         for photo_file in photo_files:
             Photo.objects.create(offer=instance, image=photo_file)
 
         # Manually update each field in the instance
-        instance.name = data.get('name', instance.name)
-        instance.description = data.get('description', instance.description)
-        instance.url = data.get('url', instance.url)
-        instance.price = data.get('price', instance.price)
-        instance.campaign_id = data.get('campaign', instance.campaign_id)
+        instance.name = data.get("name", instance.name)
+        instance.description = data.get("description", instance.description)
+        instance.url = data.get("url", instance.url)
+        instance.price = data.get("price", instance.price)
+        instance.campaign_id = data.get("campaign", instance.campaign_id)
 
         instance.save()
 
@@ -163,6 +165,7 @@ class OfferViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
 
+
 class ClickViewSet(viewsets.ModelViewSet):
     queryset = Click.objects.all()
     serializer_class = ClickSerializer
@@ -170,14 +173,33 @@ class ClickViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         request = self.request
+        print("Request POST data:", request.data)  # Логирование данных запроса
         user_ip = request.META.get("REMOTE_ADDR")
         user_agent_string = request.META.get("HTTP_USER_AGENT")
         user_agent = user_agents.parse(user_agent_string)
         os = user_agent.os.family
         browser = user_agent.browser.family
+        print(
+            f"IP: {user_ip}, User Agent: {user_agent_string}, OS: {os}, Browser: {browser}"
+        )
         serializer.save(
             user_ip=user_ip, user_agent=user_agent_string, os=os, browser=browser
         )
+
+    def create(self, request, *args, **kwargs):
+        print("Incoming data:", request.data)  # Логирование данных запроса
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(
+                serializer.data, status=status.HTTP_201_CREATED, headers=headers
+            )
+        else:
+            print(
+                "Serializer errors:", serializer.errors
+            )  # Логирование ошибок сериализатора
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LeadViewSet(viewsets.ModelViewSet):
