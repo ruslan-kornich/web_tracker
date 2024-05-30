@@ -1,20 +1,18 @@
 import React, { useEffect } from 'react';
-import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-const Logout = () => {
+const Logout = ({ setIsAuthenticated }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    setIsAuthenticated(false);
     navigate('/login');
-  }, [navigate]);
+  }, [setIsAuthenticated, navigate]);
 
   return (
-    <Button variant="contained" color="secondary">
-      Logout
-    </Button>
+    <div>Logging out...</div>
   );
 };
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import CampaignsPage from './pages/CampaignsPage';
@@ -11,18 +11,26 @@ import PrivateRoute from './components/PrivateRoute';
 import NavBar from './components/NavBar';
 
 const App = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   return (
     <Router>
-      <NavBar />
+      <NavBar isAuthenticated={isAuthenticated} />
       <Routes>
         <Route exact path="/" element={<HomePage />} />
-        <Route path="/login" element={<Login/>} />
-         <Route path="/campaigns" element={<PrivateRoute><CampaignsPage /></PrivateRoute>}/>
-        <Route path="/campaigns/:campaignId/offers" element={<PrivateRoute><OffersPage /></PrivateRoute>} />
-        <Route path="/offers/:offerId" element={<PrivateRoute><OfferDetailsPage /></PrivateRoute>} />
+        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/campaigns" element={<PrivateRoute isAuthenticated={isAuthenticated}><CampaignsPage /></PrivateRoute>} />
+        <Route path="/campaigns/:campaignId/offers" element={<PrivateRoute isAuthenticated={isAuthenticated}><OffersPage /></PrivateRoute>} />
+        <Route path="/offers/:offerId" element={<PrivateRoute isAuthenticated={isAuthenticated}><OfferDetailsPage /></PrivateRoute>} />
         <Route path="/offers/:id/public" element={<PublicOfferDetailsPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/logout" element={<Logout />} />
+        <Route path="/logout" element={<Logout setIsAuthenticated={setIsAuthenticated} />} />
       </Routes>
     </Router>
   );
