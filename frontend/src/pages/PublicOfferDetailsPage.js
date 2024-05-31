@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Typography, Button } from '@mui/material';
+import { Helmet } from 'react-helmet';
 import ImageGallery from 'react-image-gallery';
 import 'react-image-gallery/styles/css/image-gallery.css';
 import './PublicOfferDetailsPage.css';
@@ -44,6 +45,9 @@ const PublicOfferDetailsPage = () => {
 
   return (
     <Container>
+      <Helmet>
+        <title>{offer.name ? `Offer - ${offer.name}` : 'Loading...'}</title>
+      </Helmet>
       <div className="offer-details">
         {images.length > 0 && (
           <div className="offer-gallery">
