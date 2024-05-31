@@ -95,9 +95,9 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "tracker",
-        "USER": "postgres1",
+        "USER": "postgres",
         "PASSWORD": "postgres12",
-        "HOST": "localhost",
+        "HOST": "db",
         "PORT": "5432",
     }
 }
