@@ -81,12 +81,12 @@ After assembly of the docker containers run:
     python manage.py loaddata data.json
     ```
 
-    This will load the prepared data:
+This will load the prepared data:
 
-    Test user:
+Test user:
 
-    - **Login:** admin
-    - **Password:** admin
+- **Login:** admin
+- **Password:** admin
 
 ## Docs
 
