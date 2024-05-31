@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Container, Typography, Grid, Button } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import OfferCard from '../components/OfferCard';
 import EditOfferModal from '../components/EditOfferModal';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
@@ -126,11 +127,14 @@ const OffersPage = () => {
   };
 
   const handleAddClick = () => {
-    setAddModalOpen(true); // Открываем модалку добавления
+    setAddModalOpen(true);
   };
 
   return (
     <Container>
+      <Helmet>
+        <title>Offers for Campaign {campaignId}</title>
+      </Helmet>
       <Typography variant="h4" gutterBottom>
         Offers
       </Typography>

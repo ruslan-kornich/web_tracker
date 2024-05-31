@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Container, Typography, Button, ButtonGroup } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -137,6 +138,9 @@ const OfferDetailsPage = () => {
 
   return (
     <Container>
+      <Helmet>
+        <title>{offerInfo.name ? `Offer Details - ${offerInfo.name}` : 'Loading...'}</title>
+      </Helmet>
       <Typography variant="h4" gutterBottom>
         Offer Details
       </Typography>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, TextField, Pagination, Box, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import CampaignList from '../components/CampaignList';
 import EditCampaignModal from '../components/EditCampaignModal';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
@@ -140,6 +141,9 @@ const CampaignsPage = () => {
 
   return (
     <Container>
+      <Helmet>
+        <title>Campaigns</title>
+      </Helmet>
       <Typography variant="h4" gutterBottom>
         Campaigns
       </Typography>

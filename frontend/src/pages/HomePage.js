@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Container, Grid, Card, CardContent, Typography, CardActions, Button, TextField } from '@mui/material';
 import UAParser from 'ua-parser-js';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import './HomePage.css';
 
 const HomePage = () => {
@@ -79,6 +80,9 @@ const HomePage = () => {
 
   return (
     <Container>
+      <Helmet>
+        <title>Homepage - Offers</title>
+      </Helmet>
       <Typography variant="h4" gutterBottom>
         Available Offers
       </Typography>

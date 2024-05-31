@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Container, TextField, Button, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 const Login = ({ setIsAuthenticated }) => {
   const [username, setUsername] = useState('');
@@ -28,6 +29,9 @@ const Login = ({ setIsAuthenticated }) => {
 
   return (
     <Container maxWidth="xs">
+      <Helmet>
+        <title>Login</title>
+      </Helmet>
       <Typography variant="h4" component="h1" gutterBottom>
         Login
       </Typography>
