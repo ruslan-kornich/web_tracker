@@ -73,13 +73,14 @@ in a clean application without data.
 Test data and a test user will be created in the application, which will allow to see clearly the functionality of the application
 After assembly of the docker containers run:
 
-    ```bash
-    docker exec -it web_tracker_backend_1 /bin/bash
-    ```
+    
+```bash
+docker exec -it web_tracker_backend_1 /bin/bash
+```
 
-    ```bash
-    python manage.py loaddata data.json
-    ```
+```bash
+python manage.py loaddata data.json
+```
 
 This will load the prepared data:
 
